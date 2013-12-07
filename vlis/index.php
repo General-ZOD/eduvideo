@@ -1,6 +1,6 @@
 <?php
 //values for client-side purposes
-//define('DOMAIN', 'http://pazzionate.com/');
+define('DOMAIN', 'http://pazzionate.com/');
 define('DOMAIN', 'http://localhost:83/');
 define('IMAGE', DOMAIN . 'img/');
 define('THUMBNAILS', IMAGE . 'thb/');
