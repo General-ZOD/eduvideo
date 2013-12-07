@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+
+<body>
+<style type="text/css">
+    html, body{margin:0; padding:0; width:100%; height:100%; font-family:ABeeZee, Geneva, sans-serif; font-size:15px; background:#f6f6f6;}
+    div#wrapper{margin:0; padding:0; min-width:500px; width:100%; min-height:100%; overflow:auto; position:relative;}
+    div#very_top{height: 20px; background:#333;}
+    div#footer_wrapper{margin:0; padding:0 0 10px 0; width:100%; position:absolute; bottom:0; overflow:hidden; background: #252525;}
+    div#header{margin:0 auto; width:50px;}
+    div#content{margin:0 auto 40px auto; width:500px; clear:both; float:none;}
+    div#footer{margin:0 auto; width:500px;}
+    div#footer ul li{float: left; list-style:none; padding: 5px 10px;}
+    div#footer ul li a{color:#d1d1f6; text-decoration:none;} div#footer ul li a:hover{font-size:13px; font-weight:bold; color:#fff;}
+</style>
+<div id="wrapper">
+    <div id="very_top" style="height:20px; background:#333;">&nbsp;</div>
+    <div id="header">
+        <a class="home" href="http://pazzionate.com/" >
+            <img src="http://pazzionate.com/img/logo.png">
+        </a>
+    </div>
+
+    <div id="content">
+      <h1>{{recipient}},</h1>
+      <div id="mail_content">{{content}}
+      <p>
+          <strong>Yours,</strong> <br />
+          <span>The VLIS team</span>
+      </p>
+      </div>
+    </div>
+
+    <div id="footer_wrapper" style="margin:0; padding:0 0 10px 0; width:100%; position:absolute; bottom:0; overflow:hidden; background: #252525;">
+        <div id="footer">
+            <ul>
+                <li><a href="/privacy">Privacy</a></li>
+                <li><a href="/tos">Term and Conditions</a></li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

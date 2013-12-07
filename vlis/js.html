@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+            <head>
+             <script type="text/javascript">
+                var worker = new Worker("fileupload.js");
+                var dropZone;
+                worker.onmessage = function(e){
+                    alert(e.data);
+                }
+                
+                worker.onerror = function(e){
+                    console.log("ERROR: Line ", e.lineno, " in ", e.filename, ": ", e.message);
+                }
+                
+                
+var p=true, index=0;
+function upload(blobOrFile){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/uploaded.php?index=" + index, false);
+    xhr.onload = function(e){
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            file_response = xhr.responseText;
+          }
+        };
+    xhr.send(blobOrFile);
+}
+
+function process(file){
+    var blob = file;
+      
+    const BYTES_PER_CHUNK = 1024 * 1024;
+    const SIZE = blob.size;
+    
+    var start = 0;
+    var end = BYTES_PER_CHUNK;
+    
+    while(start < SIZE){
+        //var chunk = ("mozSlice" in blob)? blob.mozSlice(start, end): blob.slice(start, end);
+        var chunk = blob.slice(start, end);
+        upload(chunk);
+        
+        start = end;
+        end = start + BYTES_PER_CHUNK;
+         ++index;
+    }
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/uploaded.php", false);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.onload = function(e){
+        if (xhr.readyState == 4 && xhr.status==200) {
+            var response = JSON.parse(xhr.responseText);
+            if (response.code=="0")
+                alert(response.message);
+            else
+                alert("Some error"); 
+        }
+    }
+    xhr.send("uploaded_complete=done");    
+    //self.postMessage(blob.name + " Uploaded successfully");
+}
+
+/*self.onmessage = function(e){
+    for (var j=0; j < e.data.length; j++)
+        file.push(e.data[j]);
+    
+    if (p)
+      process();
+}*/                
+                
+                
+                
+                
+                function handleFileSelect(evt){
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                    evt.dataTransfer.dropEffect = "copy";
+                    
+                    var file = evt.dataTransfer.files[0] || evt.target.files[0];              
+                    //worker.postMessage({"files": file});
+                    alert("Name is " + file.name);
+                    alert("File type is " + file.type);
+                    //alert("File size is " + file.size);
+                    var total_packets = Math.ceil(file.size/(1024 * 1024));
+                    //alert(total_packets);
+                    return;
+                    var result = sendDataFirst(file.name, total_packets);
+                    if (result){
+                        process(file);
+                    }
+                    else
+                       alert("Sorry! Aint no data will be sent today");
+                }
+                
+                function sendDataFirst(filename, total_packets){
+                    var response_to_send;
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", "/uploaded.php", false);
+                    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+                    xhr.onload = function(e){
+                        if (xhr.readyState == 4 && xhr.status==200) {
+                            var response = JSON.parse(xhr.responseText);
+                            if (response.code=="0"){
+                                alert(response.message);
+                                response_to_send = true;
+                            }else{
+                                response_to_send = false;
+                            }                            
+                        }
+                        //return false; 
+                    }
+                    xhr.send("name=" + filename + "&total_packets=" + total_packets);
+                    return response_to_send;
+                }
+                
+                function handleDragOver(evt){
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                    //evt.dataTransfer.dropEffect = "copy";
+                }
+                
+                window.onload = function(){
+                    dropZone = document.getElementById("file_uploaded");
+                    dropZone.addEventListener("dragenter", dragenter, false);
+                    dropZone.addEventListener("dragover", dragover, false);
+                    dropZone.addEventListener("drop", handleFileSelect, false);
+                    document.getElementById("files").addEventListener("change", handleFileSelect, false);                    
+                }
+                
+                
+                var dropbox;
+                /*window.onload = function(){
+                    dropbox = document.getElementById("file_uploaded");
+                    dropbox.addEventListener("dragenter", dragenter, false);
+                    dropbox.addEventListener("dragover", dragover, false);
+                    dropbox.addEventListener("drop", drop, false);
+                }*/
+                
+                function dragenter(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+                
+                function dragover(e){
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+                
+                function drop(e){
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
+                    var dt = e.dataTransfer;
+                    var files = dt.files;
+                    var file = files[0];
+                    
+                    alert("Name is " + file.name);
+                    alert("File type is " + file.type);
+                    alert("File size is " + file.size);
+                    process(file);
+                }
+                
+             </script>
+            </head>
+    <body>
+        <style type="text/css">
+            div{width:700px;}
+            #files{height:0; width:0; visibility:hidden;}
+            #file_uploaded{margin:0 auto; padding:20px; width:200px; height:100px; background:#ccc; border-radius:4px;}
+        </style>
+        <div>
+            <form method="post" enctype="multipart/form-data" name="video">
+             <input type="file" name="myfiles" id="files" />
+             <p dragzone="copy" id="file_uploaded">Drag files in here</p>
+            </form>
+        </div>
+  </body>
+</html>
